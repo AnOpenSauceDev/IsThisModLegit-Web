@@ -1,0 +1,260 @@
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+    h1{
+        text-align:center;
+        font-family: "Jetbrains Mono";
+    }
+    h3{
+        text-align:center;
+        font-family: "Jetbrains Mono";
+    }
+    
+    p{
+        text-align: center;
+        font-family: "Jetbrains Mono";
+    }
+
+    form{
+        display: inline-block;
+    }
+
+    a{
+        color: lightcoral;
+    }
+
+    a:visited{
+        color: lightcoral;
+    }
+
+    input{
+        text-align: center;
+        align-items: center;
+        margin: auto;
+        display: inline;
+        font-family: "Jetbrains Mono";
+    }
+    label{
+        font-family: "Jetbrains Mono";
+    }
+
+    summary{
+        text-align: center;
+        font-family: "Jetbrains Mono";
+        font-size: larger;
+        font-weight: bold;
+    }
+    li{
+        text-align: left;
+    }
+
+    details{
+    font-family: "Jetbrains Mono";
+    text-align: center;
+    }
+
+    div{
+        margin-left: auto; margin-right: auto;
+        text-align: center;
+    }
+
+    h2{
+        font-size: smaller;
+        align-content: center;
+        text-align: center;
+        font-family: "Jetbrains Mono";
+        color: grey;
+        
+    }
+
+    .result-found{
+        border: 3px lightgreen;
+        border-radius: 7px;
+        background-color: lightgreen;
+    }
+
+    .result-bad{
+        border: 3px salmon;
+        background-color: salmon;
+        border-radius: 7px;
+    }
+
+</style>
+<h1>Is This Mod Legit?</h1>
+<h2>find out whether or not your mods have been tampered with. Powered by Modrinth's API.</h2>
+
+<p><a href="https://github.com/AnOpenSauceDev/IsThisModLegit-Web/issues">Found an issue? Report it here!</a></p>
+
+
+<br>
+
+<div>
+
+<p id="result"></p>
+
+<p>File Upload</p>
+<form onsubmit="handleButtonPress('file')" id="form">
+    <br>
+    <label>Upload file:</label> <input type="file" id="fileSelector" onchange="hashFile();"> <input type="submit" value="Scan Mod!"></input>
+    <p id="filehash"></p> 
+</form>
+
+<br>
+
+<p>Hash Search</p>
+<form onsubmit="handleButtonPress('hash')" id="form">
+    <label for="hash">SHA1 Hash</label>
+    <br>
+    <input type="text" id="hash"></input> <input type="submit" value="Search Hash!"></input>
+</form>
+
+
+
+<script>// full credit to: https://stackoverflow.com/questions/60595630/javascript-use-input-type-file-to-compute-sha256-file-hash
+// my solution was... much worse compared to this.
+
+var filehash = document.getElementById("filehash");
+
+function hashFile() {
+
+  readBinaryFile(fileSelector.files[0])
+    .then(function(result) {
+      result = new Uint8Array(result);
+      return window.crypto.subtle.digest('SHA-512', result); // SHA-1 produces zeros that cause things to break
+    }).then(function(result) {
+      result = new Uint8Array(result);
+      var resultHex = Uint8ArrayToHexString(result);
+      filehash.innerText = resultHex;
+    });
+}
+
+function readBinaryFile(file) {
+  return new Promise((resolve, reject) => {
+    var fr = new FileReader();
+    fr.onload = () => {
+      resolve(fr.result)
+    };
+    fr.readAsArrayBuffer(file);
+  });
+}
+
+function Uint8ArrayToHexString(ui8array) {
+  var hexString = '',
+    h;
+  for (var i = 0; i < ui8array.length; i++) {
+    h = ui8array[i].toString(16);
+    if (h.length == 1) {
+      h = '0' + h;
+    }
+    hexString += h;
+  }
+  var p = Math.pow(2, Math.ceil(Math.log2(hexString.length)));
+  hexString = hexString.padStart(p, '0');
+  return hexString;
+}
+
+
+
+</script>
+
+
+</div>
+
+<script>
+
+    function handleButtonPress(type){
+
+        if(type == "hash"){
+        var sha1 = document.getElementById("hash");
+        var reqstring = "https://api.modrinth.com/v2/version_file/" + sha1.value + "?algorithm=sha1"
+        }
+        else{ // file upload
+            var sha1 = document.getElementById("filehash");
+            var reqstring = "https://api.modrinth.com/v2/version_file/" + sha1.innerText + "?algorithm=sha512"
+            document.getElementById("fileSelector").value = "";
+        }
+
+        var result = document.getElementById("result");
+
+        if(sha1.innerText == ""){
+            result.innerText = "This... is not a file. Please upload a real file."
+            return;
+        }
+        
+        if(type == "file"){
+            sha1.innerText = "";
+        }
+
+        //var reqstring = "https://api.modrinth.com/v2/version_file/" + sha1.value + "?algorithm=sha1"
+        console.log("grabbing from " + reqstring)
+        var requestdata = GET(reqstring);
+        if(requestdata.status == 200){
+            result.innerHTML = "<div class='result-found'>This mod's hash matches 1:1 on Modrinth!</div>"
+        }else if(requestdata.status == 410){
+            result.innerText = "ERROR: The modrinth API endpoint is deprecated."
+        }else{
+            result.innerHTML = "<div class='result-bad'>Warning, no matching hash found! Read the FAQ for more information.</div"
+        }
+
+    }
+
+    function GET(URL)
+    {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", URL, false );
+    xmlHttp.send( null );
+    return xmlHttp;
+    }
+
+
+var form = document.getElementById("form");
+function handleForm(event) { event.preventDefault(); } 
+form.addEventListener('submit', handleForm);
+</script>
+
+<br>
+
+<details>
+    <summary>FAQ</summary>
+    <h3  name="no-matching-hash">There wasn't a matching hash for my mod!</h3>
+    This could mean one of a few things. Either:
+    <ul>
+    <li>Your mod is not available anywhere on Modrinth. This might be because the mod is only on a platform like CurseForge, or it's a developer build on GitHub.</li>
+    <li>Your mod has been <strong>potentially tampered with.</strong> If you're not 100% about the legitimacy of this mod, you should remove it, just to be safe.</li>
+    </ul>
+
+    <br>
+
+    <h3>Does this support plugins?</h3>
+    <strong>Yes!</strong> This works with mods, plugins and even Modpacks!
+
+    <br>     <br>
+
+    <h3>Will you support CurseForge mods?</h3>
+        <strong>No,</strong> CurseForge doesn't really have a good way to grab a mod from a file hash. There also have been multiple cases of malware distribution on CurseForge, so it's best to steer clear anyways. 
+    
+        <br>     <br>
+
+    <h3>Is there a way to bulk-scan mods?</h3>
+        <strong>Yes... kinda...</strong> Is This Mod Legit does have a <a href="https://modrinth.com/mod/is-this-mod-legit"> companion mod</a>, but that requires you... running Minecraft to scan your mods, so this isn't a great idea in hindsight.
+
+        <br>     <br>
+
+    <h3>Are only specific modloaders supported?</h3>
+        <strong>No!</strong> all modloaders/server types (and even files that aren't mods) are supported.
+
+        <br>     <br>
+
+    <h3>Are any other games supported?</h3>
+        <strong>Not yet...</strong> but Modrinth has plans to support other games, and other mod distribution APIs can be added here in the future.
+  
+        <br>     <br>
+
+    <h3>Why is this website in vanilla CSS/JS?</h3>
+        I <i>normally</i> use Svelte like a sane developer, but i was too lazy to make a project this time, and made this atrocity instead. 😎
+
+</details>
+
+<h2>A Project by <a href="https://github.com/AnOpenSauceDev">AnOpenSauceDev</a></h2>
