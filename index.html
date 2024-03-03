@@ -91,7 +91,7 @@
 <h1>Is This Mod Legit?</h1>
 <h2>Find out whether or not your mods have been tampered with. Powered by Modrinth's API.</h2>
 
-<script defer data-domain="isthismodlegit.anopensauce.dev" src="https://analytics.anopensauce.dev/js/script.js"></script>
+<script defer data-domain="isthismodlegit.anopensauce.dev" src="https://analytics.anopensauce.dev/js/script.tagged-events.js"></script>
 
 
 <p><a href="https://github.com/AnOpenSauceDev/IsThisModLegit-Web/issues">Found an issue? Report it here!</a></p>
@@ -106,7 +106,7 @@
 <p>File Upload</p>
 <form onsubmit="handleButtonPress('file')" id="form">
     <br>
-    <label>Upload file:</label> <input type="file" id="fileSelector" onchange="hashFile();"> <input type="submit" value="Scan Mod!"></input>
+    <label>Upload file:</label> <input type="file" id="fileSelector" onchange="hashFile();"> <input class="plausible-event-name=Scan" type="submit" value="Scan Mod!"></input>
     <p id="filehash"></p> 
 </form>
 
@@ -116,7 +116,7 @@
 <form onsubmit="handleButtonPress('hash')" id="form">
     <label for="hash">SHA1 Hash</label>
     <br>
-    <input type="text" id="hash"></input> <input type="submit" value="Search Hash!"></input>
+    <input type="text" id="hash"></input> <input class="plausible-event-name=Scan" type="submit" value="Search Hash!"></input>
 </form>
 
 
