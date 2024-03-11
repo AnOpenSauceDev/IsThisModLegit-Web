@@ -104,6 +104,7 @@
 <p id="result"></p>
 
 <p>File Upload</p>
+<h2>Your uploaded files never leave your computer, only the hash.</h2>
 <form onsubmit="handleButtonPress('file')" id="form">
     <br>
     <label>Upload file:</label> <input type="file" id="fileSelector" onchange="hashFile();"> <input class="plausible-event-name=Scan" type="submit" value="Scan Mod!"></input>
@@ -255,6 +256,9 @@ form.addEventListener('submit', handleForm);
         <strong>No!</strong> all modloaders/server types (and even files that aren't mods) are supported.
 
         <br>     <br>
+
+    <h3>Is any data tracked?</h3>
+        <strong>No!</strong> I use a Plausible Analytics instance that's fully GDPR compliant, and no files uploaded ever get saved. Only the file hashes leave your computer.
 
     <h3>Are any other games supported?</h3>
         <strong>Not yet...</strong> but Modrinth has plans to support other games, and other mod distribution APIs can be added here in the future.
